@@ -23,6 +23,7 @@ from mlflow.entities import (
     Run,
     ViewType,
     ExperimentTag,
+    User
 )
 from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.store.db.base_sql_model import Base
@@ -463,3 +464,58 @@ class SqlParam(Base):
         :return: :py:class:`mlflow.entities.Param`.
         """
         return Param(key=self.key, value=self.value)
+
+
+class SqlUser(Base):
+    """
+    DB model for :py:class:`mlflow.entities.User`. These are recorded in ``user`` table.
+    """
+
+    __tablename__ = "user"
+
+    id = Column(Integer, autoincrement=True)
+    """
+    ID: `Integer`. *Primary Key* for ``user`` table.
+    """
+    username = Column(String(255), nullable=False, unique=True)
+    """
+    Username: `String` (limit 255 characters).
+    """
+    password = Column(String(255), nullable=False)
+    """
+    Password: `String` (limit 255 characters)
+    """
+    role = Column(String(5000))
+    """
+    Roles of entities assigned to user: `String` (limit 5000 characters).
+    """
+    creation_time = Column(BigInteger(), default=get_current_time_millis)
+    """
+    Creation time of usser: `BigInteger`.
+    """
+    last_update_time = Column(BigInteger(), default=get_current_time_millis)
+    """
+    Last Update time of user: `BigInteger`.
+    """
+
+    __table_args__ = (
+        PrimaryKeyConstraint("id", name="id_pk"),
+    )
+
+    def __repr__(self):
+        return "<SqlUser ({}, {})>".format(self.id, self.username)
+
+    def to_mlflow_entity(self):
+        """
+        Convert DB model to corresponding MLflow entity.
+
+        :return: :py:class:`mlflow.entities.Experiment`.
+        """
+        return User(
+            id=str(self.id),
+            name=self.username,
+            password=self.password,
+            role=self.role,
+            creation_time=self.creation_time,
+            last_update_time=self.last_update_time,
+        )

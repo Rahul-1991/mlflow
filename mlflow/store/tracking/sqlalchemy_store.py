@@ -58,6 +58,8 @@ from mlflow.utils.validation import (
 )
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
 from mlflow.utils.time_utils import get_current_time_millis
+from mlflow.utils.auth_utils import decorate_all_functions, authorise_method_calls
+
 
 _logger = logging.getLogger(__name__)
 
@@ -70,6 +72,7 @@ _logger = logging.getLogger(__name__)
 sqlalchemy.orm.configure_mappers()
 
 
+@decorate_all_functions(authorise_method_calls)
 class SqlAlchemyStore(AbstractStore):
     """
     SQLAlchemy compliant backend store for tracking meta data for MLflow entities. MLflow
