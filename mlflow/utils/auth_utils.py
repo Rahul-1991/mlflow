@@ -83,7 +83,7 @@ def authorise_method_calls(func):
         # except Exception as e:
         #     user_role = dict()
         user_role = {'PV': {'experiment': ["exp2"]}}
-        if func.__name__ == '__init__':
+        if func.__name__ in ('__init__', 'get_jwt_auth_token'):
             func(self, *args, **kw)
         else:
             args1, varargs1, keywords1, defaults1 = inspect.getargspec(func)

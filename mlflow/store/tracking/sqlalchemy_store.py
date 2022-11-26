@@ -5,7 +5,7 @@ import time
 import uuid
 import threading
 from functools import reduce
-
+import jwt
 import math
 import sqlalchemy
 import sqlalchemy.sql.expression as sql
@@ -244,6 +244,10 @@ class SqlAlchemyStore(AbstractStore):
 
     def _get_artifact_location(self, experiment_id):
         return append_to_uri_path(self.artifact_root_uri, str(experiment_id))
+
+    @staticmethod
+    def get_jwt_auth_token(username: str, password: str) -> str:
+        return jwt.encode({'username': username, 'password': password}, '004f2af45d3a4e161a7dd2d17fdae47f', 'HS256')
 
     def create_experiment(self, name, artifact_location=None, tags=None):
         _validate_experiment_name(name)
