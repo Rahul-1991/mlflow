@@ -1,8 +1,9 @@
+import os
 from abc import abstractmethod, ABCMeta
-
 from mlflow.entities import ViewType
 from mlflow.store.entities.paged_list import PagedList
 from mlflow.store.tracking import SEARCH_MAX_RESULTS_DEFAULT
+from mlflow.utils.auth_utils import verify_user_credentials_from_env_file, decorate_all_functions, authorise_method_calls
 
 
 class AbstractStore:
@@ -17,6 +18,22 @@ class AbstractStore:
         """
         Empty constructor for now. This is deliberately not marked as abstract, else every
         derived class would be forced to create one.
+        """
+        self.user_data = verify_user_credentials_from_env_file(os.environ.get('jwt_token_path'))
+
+    @abstractmethod
+    def list_experiments(self, view_type=ViewType.ACTIVE_ONLY, max_results=None, page_token=None):
+        """
+        :param view_type: Qualify requested type of experiments.
+        :param max_results: If passed, specifies the maximum number of experiments desired. If not
+                            passed, all experiments will be returned. However, certain server
+                            backend may apply its own limit. Check returned ``PagedList`` token to
+                            see if additional experiments are available.
+        :param page_token: Token specifying the next page of results. It should be obtained from
+                            a ``list_experiments`` call.
+        :return: A :py:class:`PagedList <mlflow.store.entities.PagedList>` of
+                 :py:class:`Experiment <mlflow.entities.Experiment>` objects. The pagination token
+                 for the next page can be obtained via the ``token`` attribute of the object.
         """
         pass
 

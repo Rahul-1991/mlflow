@@ -5,7 +5,7 @@ import time
 import uuid
 import threading
 from functools import reduce
-
+import jwt
 import math
 import sqlalchemy
 import sqlalchemy.sql.expression as sql
@@ -58,6 +58,8 @@ from mlflow.utils.validation import (
 )
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
 from mlflow.utils.time_utils import get_current_time_millis
+from mlflow.utils.auth_utils import decorate_all_functions, authorise_method_calls
+
 
 _logger = logging.getLogger(__name__)
 
@@ -70,6 +72,7 @@ _logger = logging.getLogger(__name__)
 sqlalchemy.orm.configure_mappers()
 
 
+@decorate_all_functions(authorise_method_calls)
 class SqlAlchemyStore(AbstractStore):
     """
     SQLAlchemy compliant backend store for tracking meta data for MLflow entities. MLflow
@@ -241,6 +244,10 @@ class SqlAlchemyStore(AbstractStore):
 
     def _get_artifact_location(self, experiment_id):
         return append_to_uri_path(self.artifact_root_uri, str(experiment_id))
+
+    @staticmethod
+    def get_jwt_auth_token(username: str, password: str) -> str:
+        return jwt.encode({'username': username, 'password': password}, '004f2af45d3a4e161a7dd2d17fdae47f', 'HS256')
 
     def create_experiment(self, name, artifact_location=None, tags=None):
         _validate_experiment_name(name)

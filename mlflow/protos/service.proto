@@ -403,6 +403,18 @@ service MlflowService {
       rpc_doc_title: "Log Model",
     };
   }
+
+  rpc getAuthToken (GetAuthToken) returns (GetAuthToken.Response) {
+    option (rpc) = {
+        endpoints: [{
+            method: "POST",
+            path: "/mlflow/auth"
+            since { major: 2, minor: 0 },
+        }],
+        visibility: PUBLIC,
+        rpc_doc_title: "Get Auth Token",
+    };
+  }
 }
 
 // View type for ListExperiments query.
@@ -1023,4 +1035,14 @@ message GetExperimentByName {
     // Experiment details.
     optional Experiment experiment = 1;
   }
+}
+
+message GetAuthToken {
+    option (scalapb.message).extends = "com.databricks.rpc.RPC[$this.Response]";
+    optional string username = 1 [(validate_required) = true];
+    optional string password = 2 [(validate_required) = true];
+
+    message Response {
+        optional string jwt_token = 1;
+    }
 }
