@@ -5,13 +5,13 @@ import time
 import uuid
 import threading
 from functools import reduce
-
+import jwt
 import math
 import sqlalchemy
 import sqlalchemy.sql.expression as sql
 from sqlalchemy import sql
 from sqlalchemy.future import select
-
+from mlflow.utils.constants import JWT_SECRET_KEY, JWT_ENCRYPTION_ALGORITHM
 from mlflow.entities import RunTag
 from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.store.tracking import SEARCH_MAX_RESULTS_DEFAULT, SEARCH_MAX_RESULTS_THRESHOLD
@@ -25,6 +25,7 @@ from mlflow.store.tracking.dbmodels.models import (
     SqlTag,
     SqlExperimentTag,
     SqlLatestMetric,
+    SqlUser
 )
 from mlflow.store.db.base_sql_model import Base
 from mlflow.entities import RunStatus, SourceType, Experiment
@@ -241,6 +242,17 @@ class SqlAlchemyStore(AbstractStore):
 
     def _get_artifact_location(self, experiment_id):
         return append_to_uri_path(self.artifact_root_uri, str(experiment_id))
+
+    def _get_user_detail(self, username: str, password: str):
+        with self.ManagedSessionMaker() as session:
+            user_data = session.query(SqlUser).filter_by(username=username, password=password).first()
+            if not user_data:
+                raise MlflowException('User({}) does not exist'.format(username), RESOURCE_DOES_NOT_EXIST)
+            return user_data.to_mlflow_entity()
+
+    def get_jwt_auth_token(self, username: str, password: str) -> str:
+        user_data = self._get_user_detail(username, password)
+        return jwt.encode({'username': user_data.username, 'password': user_data.password, 'role': user_data.role}, JWT_SECRET_KEY, JWT_ENCRYPTION_ALGORITHM)
 
     def create_experiment(self, name, artifact_location=None, tags=None):
         _validate_experiment_name(name)

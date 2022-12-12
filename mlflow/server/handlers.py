@@ -44,6 +44,7 @@ from mlflow.protos.service_pb2 import (
     SetExperimentTag,
     GetExperimentByName,
     LogModel,
+    GetAuthToken
 )
 from mlflow.protos.model_registry_pb2 import (
     ModelRegistryService,
@@ -582,6 +583,24 @@ def _not_implemented():
 
 
 # Tracking Server APIs
+
+
+@catch_mlflow_exception
+@_disable_if_artifacts_only
+def _get_auth_token():
+    request_message = _get_request_message(
+        GetAuthToken(),
+        schema={
+            "username": [_assert_required, _assert_string],
+            "password": [_assert_required, _assert_string]
+        }
+    )
+    response_message = GetAuthToken.Response()
+    jwt_token = _get_tracking_store().get_jwt_auth_token(request_message.username, request_message.password)
+    response_message.jwt_token = jwt_token
+    response = Response(mimetype="application/json")
+    response.set_data(message_to_json(response_message))
+    return response
 
 
 @catch_mlflow_exception
@@ -1614,6 +1633,7 @@ HANDLERS = {
     ListArtifacts: _list_artifacts,
     GetMetricHistory: _get_metric_history,
     SearchExperiments: _search_experiments,
+    GetAuthToken: _get_auth_token,
     # Model Registry APIs
     CreateRegisteredModel: _create_registered_model,
     GetRegisteredModel: _get_registered_model,
