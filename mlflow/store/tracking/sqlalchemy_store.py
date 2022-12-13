@@ -59,6 +59,7 @@ from mlflow.utils.validation import (
 )
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
 from mlflow.utils.time_utils import get_current_time_millis
+from mlflow.utils.decorators import authorise_class_methods
 
 _logger = logging.getLogger(__name__)
 
@@ -71,6 +72,8 @@ _logger = logging.getLogger(__name__)
 sqlalchemy.orm.configure_mappers()
 
 
+@authorise_class_methods()
+# This decorator checks whether the user trying to access the methods of this class has access to it.
 class SqlAlchemyStore(AbstractStore):
     """
     SQLAlchemy compliant backend store for tracking meta data for MLflow entities. MLflow
