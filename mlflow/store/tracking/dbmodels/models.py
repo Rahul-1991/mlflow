@@ -23,7 +23,8 @@ from mlflow.entities import (
     Run,
     ViewType,
     ExperimentTag,
-    User
+    User,
+    Entitlement
 )
 from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.store.db.base_sql_model import Base
@@ -516,6 +517,61 @@ class SqlUser(Base):
             username=self.username,
             password=self.password,
             role=self.role,
+            creation_time=self.creation_time,
+            last_update_time=self.last_update_time,
+        )
+
+
+class SqlEntitlement(Base):
+    """
+    DB model for :py:class:`mlflow.entities.Entitlement`. These are recorded in ``entitlements`` table.
+    """
+
+    __tablename__ = "entitlements"
+
+    entitlement_id = Column(Integer, autoincrement=True)
+    """
+    Entitlement ID: `Integer`. *Primary Key* for ``entitlements`` table.
+    """
+    team_id = Column(Integer)
+    """
+    Team ID: `Integer` save the ID denoting the team
+    """
+    team_name = Column(String(50))
+    """
+    Team Name: `String` Save the name of the team
+    """
+    permissions = Column(String(5000))
+    """
+    Permissions: `String` Save the permissions of the team
+    """
+    creation_time = Column(BigInteger(), default=get_current_time_millis)
+    """
+    Creation time of user: `BigInteger`.
+    """
+    last_update_time = Column(BigInteger(), default=get_current_time_millis)
+    """
+    Last Update time of user: `BigInteger`.
+    """
+
+    __table_args__ = (
+        PrimaryKeyConstraint("entitlement_id", name="entitlement_id_pk"),
+    )
+
+    def __repr__(self):
+        return "<SqlEntitlement ({}, {})>".format(self.entitlement_id, self.team_name)
+
+    def to_mlflow_entity(self):
+        """
+        Convert DB model to corresponding MLflow entity.
+
+        :return: :py:class:`mlflow.entities.Entitlement`.
+        """
+        return Entitlement(
+            entitlement_id=self.entitlement_id,
+            team_id=self.team_id,
+            team_name=self.team_name,
+            permissions=self.permissions,
             creation_time=self.creation_time,
             last_update_time=self.last_update_time,
         )
