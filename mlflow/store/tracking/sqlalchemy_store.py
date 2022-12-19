@@ -25,7 +25,8 @@ from mlflow.store.tracking.dbmodels.models import (
     SqlTag,
     SqlExperimentTag,
     SqlLatestMetric,
-    SqlUser
+    SqlUser,
+    SqlEntitlement
 )
 from mlflow.store.db.base_sql_model import Base
 from mlflow.entities import RunStatus, SourceType, Experiment
@@ -253,9 +254,32 @@ class SqlAlchemyStore(AbstractStore):
                 raise MlflowException('User({}) does not exist'.format(username), RESOURCE_DOES_NOT_EXIST)
             return user_data.to_mlflow_entity()
 
-    def get_jwt_auth_token(self, username: str, password: str) -> str:
+    def _get_team_permissions(self, team_ids: list):
+        with self.ManagedSessionMaker() as session:
+            team_data = session.query(SqlEntitlement).filter(SqlEntitlement.entitlement_id.in_(team_ids)).all()
+            return [data.to_mlflow_entity().permissions for data in team_data]
+
+    def _get_merged_team_permissions(self, team_ids):
+        permission_dict = dict()
+        team_permissions = self._get_team_permissions(team_ids)
+        for permission in team_permissions:
+            try:
+                permission = json.loads(permission)
+            except Exception as e:
+                permission = dict()
+            for access_level, model_resources in permission.items():
+                for model, resources in model_resources.items():
+                    if access_level in permission_dict:
+                        permission_dict.get(access_level).update({
+                            model: list(set(permission_dict.get(access_level).get(model) or list()) | set(resources))})
+                    else:
+                        permission_dict.update({access_level: model_resources})
+        return permission_dict
+
+    def get_jwt_auth_token(self, username, password, team_ids):
         user_data = self._get_user_detail(username, password)
-        return jwt.encode({'username': user_data.username, 'password': user_data.password, 'role': user_data.role}, JWT_SECRET_KEY, JWT_ENCRYPTION_ALGORITHM)
+        team_permissions = self._get_merged_team_permissions(team_ids)
+        return jwt.encode({'username': user_data.username, 'password': user_data.password, 'role': team_permissions}, JWT_SECRET_KEY, JWT_ENCRYPTION_ALGORITHM)
 
     def create_experiment(self, name, artifact_location=None, tags=None):
         _validate_experiment_name(name)

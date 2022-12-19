@@ -592,11 +592,12 @@ def _get_auth_token():
         GetAuthToken(),
         schema={
             "username": [_assert_required, _assert_string],
-            "password": [_assert_required, _assert_string]
+            "password": [_assert_required, _assert_string],
+            "team_ids": [_assert_required, _assert_array]
         }
     )
     response_message = GetAuthToken.Response()
-    jwt_token = _get_tracking_store().get_jwt_auth_token(request_message.username, request_message.password)
+    jwt_token = _get_tracking_store().get_jwt_auth_token(request_message.username, request_message.password, request_message.team_ids)
     response_message.jwt_token = jwt_token
     response = Response(mimetype="application/json")
     response.set_data(message_to_json(response_message))
