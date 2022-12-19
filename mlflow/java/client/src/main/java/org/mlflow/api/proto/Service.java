@@ -50826,7 +50826,7 @@ public final class Service {
 
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -50835,7 +50835,7 @@ public final class Service {
     boolean hasPassword();
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -50844,7 +50844,7 @@ public final class Service {
     java.lang.String getPassword();
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -50852,6 +50852,35 @@ public final class Service {
      */
     com.google.protobuf.ByteString
         getPasswordBytes();
+
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @return A list containing the teamIds.
+     */
+    java.util.List<java.lang.Integer> getTeamIdsList();
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @return The count of teamIds.
+     */
+    int getTeamIdsCount();
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @param index The index of the element to return.
+     * @return The teamIds at the given index.
+     */
+    int getTeamIds(int index);
   }
   /**
    * Protobuf type {@code mlflow.GetAuthToken}
@@ -50868,6 +50897,7 @@ public final class Service {
     private GetAuthToken() {
       username_ = "";
       password_ = "";
+      teamIds_ = emptyIntList();
     }
 
     @java.lang.Override
@@ -51594,7 +51624,7 @@ public final class Service {
     private volatile java.lang.Object password_;
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -51606,7 +51636,7 @@ public final class Service {
     }
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -51629,7 +51659,7 @@ public final class Service {
     }
     /**
      * <pre>
-     * password of the registered user.
+     * password of the registered user
      * </pre>
      *
      * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -51648,6 +51678,45 @@ public final class Service {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int TEAM_IDS_FIELD_NUMBER = 3;
+    private com.google.protobuf.Internal.IntList teamIds_;
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @return A list containing the teamIds.
+     */
+    @java.lang.Override
+    public java.util.List<java.lang.Integer>
+        getTeamIdsList() {
+      return teamIds_;
+    }
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @return The count of teamIds.
+     */
+    public int getTeamIdsCount() {
+      return teamIds_.size();
+    }
+    /**
+     * <pre>
+     * List of team ids to which user belongs
+     * </pre>
+     *
+     * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+     * @param index The index of the element to return.
+     * @return The teamIds at the given index.
+     */
+    public int getTeamIds(int index) {
+      return teamIds_.getInt(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -51670,6 +51739,9 @@ public final class Service {
       if (((bitField0_ & 0x00000002) != 0)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, password_);
       }
+      for (int i = 0; i < teamIds_.size(); i++) {
+        output.writeInt32(3, teamIds_.getInt(i));
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -51684,6 +51756,15 @@ public final class Service {
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, password_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < teamIds_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(teamIds_.getInt(i));
+        }
+        size += dataSize;
+        size += 1 * getTeamIdsList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -51710,6 +51791,8 @@ public final class Service {
         if (!getPassword()
             .equals(other.getPassword())) return false;
       }
+      if (!getTeamIdsList()
+          .equals(other.getTeamIdsList())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -51728,6 +51811,10 @@ public final class Service {
       if (hasPassword()) {
         hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
         hash = (53 * hash) + getPassword().hashCode();
+      }
+      if (getTeamIdsCount() > 0) {
+        hash = (37 * hash) + TEAM_IDS_FIELD_NUMBER;
+        hash = (53 * hash) + getTeamIdsList().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -51861,6 +51948,8 @@ public final class Service {
         bitField0_ = (bitField0_ & ~0x00000001);
         password_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        teamIds_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -51897,6 +51986,11 @@ public final class Service {
           to_bitField0_ |= 0x00000002;
         }
         result.password_ = password_;
+        if (((bitField0_ & 0x00000004) != 0)) {
+          teamIds_.makeImmutable();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.teamIds_ = teamIds_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -51956,6 +52050,16 @@ public final class Service {
           password_ = other.password_;
           onChanged();
         }
+        if (!other.teamIds_.isEmpty()) {
+          if (teamIds_.isEmpty()) {
+            teamIds_ = other.teamIds_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureTeamIdsIsMutable();
+            teamIds_.addAll(other.teamIds_);
+          }
+          onChanged();
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -51992,6 +52096,22 @@ public final class Service {
                 bitField0_ |= 0x00000002;
                 break;
               } // case 18
+              case 24: {
+                int v = input.readInt32();
+                ensureTeamIdsIsMutable();
+                teamIds_.addInt(v);
+                break;
+              } // case 24
+              case 26: {
+                int length = input.readRawVarint32();
+                int limit = input.pushLimit(length);
+                ensureTeamIdsIsMutable();
+                while (input.getBytesUntilLimit() > 0) {
+                  teamIds_.addInt(input.readInt32());
+                }
+                input.popLimit(limit);
+                break;
+              } // case 26
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -52120,7 +52240,7 @@ public final class Service {
       private java.lang.Object password_ = "";
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52131,7 +52251,7 @@ public final class Service {
       }
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52153,7 +52273,7 @@ public final class Service {
       }
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52174,7 +52294,7 @@ public final class Service {
       }
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52193,7 +52313,7 @@ public final class Service {
       }
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52207,7 +52327,7 @@ public final class Service {
       }
       /**
        * <pre>
-       * password of the registered user.
+       * password of the registered user
        * </pre>
        *
        * <code>optional string password = 2 [(.mlflow.validate_required) = true];</code>
@@ -52221,6 +52341,113 @@ public final class Service {
   }
   bitField0_ |= 0x00000002;
         password_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Internal.IntList teamIds_ = emptyIntList();
+      private void ensureTeamIdsIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          teamIds_ = mutableCopy(teamIds_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @return A list containing the teamIds.
+       */
+      public java.util.List<java.lang.Integer>
+          getTeamIdsList() {
+        return ((bitField0_ & 0x00000004) != 0) ?
+                 java.util.Collections.unmodifiableList(teamIds_) : teamIds_;
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @return The count of teamIds.
+       */
+      public int getTeamIdsCount() {
+        return teamIds_.size();
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @param index The index of the element to return.
+       * @return The teamIds at the given index.
+       */
+      public int getTeamIds(int index) {
+        return teamIds_.getInt(index);
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @param index The index to set the value at.
+       * @param value The teamIds to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTeamIds(
+          int index, int value) {
+        ensureTeamIdsIsMutable();
+        teamIds_.setInt(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @param value The teamIds to add.
+       * @return This builder for chaining.
+       */
+      public Builder addTeamIds(int value) {
+        ensureTeamIdsIsMutable();
+        teamIds_.addInt(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @param values The teamIds to add.
+       * @return This builder for chaining.
+       */
+      public Builder addAllTeamIds(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureTeamIdsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, teamIds_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * List of team ids to which user belongs
+       * </pre>
+       *
+       * <code>repeated int32 team_ids = 3 [(.mlflow.validate_required) = true];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearTeamIds() {
+        teamIds_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
@@ -52682,93 +52909,93 @@ public final class Service {
       "iment_name\030\001 \001(\tB\004\370\206\031\001\0322\n\010Response\022&\n\nex" +
       "periment\030\001 \001(\0132\022.mlflow.Experiment:+\342?(\n" +
       "&com.databricks.rpc.RPC[$this.Response]\"" +
-      "\212\001\n\014GetAuthToken\022\026\n\010username\030\001 \001(\tB\004\370\206\031\001" +
-      "\022\026\n\010password\030\002 \001(\tB\004\370\206\031\001\032\035\n\010Response\022\021\n\t" +
-      "jwt_token\030\001 \001(\t:+\342?(\n&com.databricks.rpc" +
-      ".RPC[$this.Response]*6\n\010ViewType\022\017\n\013ACTI" +
-      "VE_ONLY\020\001\022\020\n\014DELETED_ONLY\020\002\022\007\n\003ALL\020\003*I\n\n" +
-      "SourceType\022\014\n\010NOTEBOOK\020\001\022\007\n\003JOB\020\002\022\013\n\007PRO" +
-      "JECT\020\003\022\t\n\005LOCAL\020\004\022\014\n\007UNKNOWN\020\350\007*M\n\tRunSt" +
-      "atus\022\013\n\007RUNNING\020\001\022\r\n\tSCHEDULED\020\002\022\014\n\010FINI" +
-      "SHED\020\003\022\n\n\006FAILED\020\004\022\n\n\006KILLED\020\0052\372\027\n\rMlflo" +
-      "wService\022\246\001\n\023getExperimentByName\022\033.mlflo" +
-      "w.GetExperimentByName\032$.mlflow.GetExperi" +
-      "mentByName.Response\"L\362\206\031H\n,\n\003GET\022\037/mlflo" +
-      "w/experiments/get-by-name\032\004\010\002\020\000\020\001*\026Get E" +
-      "xperiment By Name\022\224\001\n\020createExperiment\022\030" +
-      ".mlflow.CreateExperiment\032!.mlflow.Create" +
-      "Experiment.Response\"C\362\206\031?\n(\n\004POST\022\032/mlfl" +
-      "ow/experiments/create\032\004\010\002\020\000\020\001*\021Create Ex" +
-      "periment\022\301\001\n\021searchExperiments\022\031.mlflow." +
-      "SearchExperiments\032\".mlflow.SearchExperim" +
-      "ents.Response\"m\362\206\031i\n(\n\004POST\022\032/mlflow/exp" +
-      "eriments/search\032\004\010\002\020\000\n\'\n\003GET\022\032/mlflow/ex" +
-      "periments/search\032\004\010\002\020\000\020\001*\022Search Experim" +
-      "ents\022\204\001\n\rgetExperiment\022\025.mlflow.GetExper" +
-      "iment\032\036.mlflow.GetExperiment.Response\"<\362" +
-      "\206\0318\n$\n\003GET\022\027/mlflow/experiments/get\032\004\010\002\020" +
-      "\000\020\001*\016Get Experiment\022\224\001\n\020deleteExperiment" +
-      "\022\030.mlflow.DeleteExperiment\032!.mlflow.Dele" +
-      "teExperiment.Response\"C\362\206\031?\n(\n\004POST\022\032/ml" +
-      "flow/experiments/delete\032\004\010\002\020\000\020\001*\021Delete " +
-      "Experiment\022\231\001\n\021restoreExperiment\022\031.mlflo" +
-      "w.RestoreExperiment\032\".mlflow.RestoreExpe" +
-      "riment.Response\"E\362\206\031A\n)\n\004POST\022\033/mlflow/e" +
-      "xperiments/restore\032\004\010\002\020\000\020\001*\022Restore Expe" +
-      "riment\022\224\001\n\020updateExperiment\022\030.mlflow.Upd" +
-      "ateExperiment\032!.mlflow.UpdateExperiment." +
-      "Response\"C\362\206\031?\n(\n\004POST\022\032/mlflow/experime" +
-      "nts/update\032\004\010\002\020\000\020\001*\021Update Experiment\022q\n" +
-      "\tcreateRun\022\021.mlflow.CreateRun\032\032.mlflow.C" +
-      "reateRun.Response\"5\362\206\0311\n!\n\004POST\022\023/mlflow" +
-      "/runs/create\032\004\010\002\020\000\020\001*\nCreate Run\022q\n\tupda" +
-      "teRun\022\021.mlflow.UpdateRun\032\032.mlflow.Update" +
-      "Run.Response\"5\362\206\0311\n!\n\004POST\022\023/mlflow/runs" +
-      "/update\032\004\010\002\020\000\020\001*\nUpdate Run\022q\n\tdeleteRun" +
-      "\022\021.mlflow.DeleteRun\032\032.mlflow.DeleteRun.R" +
-      "esponse\"5\362\206\0311\n!\n\004POST\022\023/mlflow/runs/dele" +
-      "te\032\004\010\002\020\000\020\001*\nDelete Run\022v\n\nrestoreRun\022\022.m" +
-      "lflow.RestoreRun\032\033.mlflow.RestoreRun.Res" +
-      "ponse\"7\362\206\0313\n\"\n\004POST\022\024/mlflow/runs/restor" +
-      "e\032\004\010\002\020\000\020\001*\013Restore Run\022u\n\tlogMetric\022\021.ml" +
-      "flow.LogMetric\032\032.mlflow.LogMetric.Respon" +
-      "se\"9\362\206\0315\n%\n\004POST\022\027/mlflow/runs/log-metri" +
-      "c\032\004\010\002\020\000\020\001*\nLog Metric\022t\n\010logParam\022\020.mlfl" +
-      "ow.LogParam\032\031.mlflow.LogParam.Response\";" +
-      "\362\206\0317\n(\n\004POST\022\032/mlflow/runs/log-parameter" +
-      "\032\004\010\002\020\000\020\001*\tLog Param\022\241\001\n\020setExperimentTag" +
-      "\022\030.mlflow.SetExperimentTag\032!.mlflow.SetE" +
-      "xperimentTag.Response\"P\362\206\031L\n4\n\004POST\022&/ml" +
-      "flow/experiments/set-experiment-tag\032\004\010\002\020" +
-      "\000\020\001*\022Set Experiment Tag\022f\n\006setTag\022\016.mlfl" +
-      "ow.SetTag\032\027.mlflow.SetTag.Response\"3\362\206\031/" +
-      "\n\"\n\004POST\022\024/mlflow/runs/set-tag\032\004\010\002\020\000\020\001*\007" +
-      "Set Tag\022u\n\tdeleteTag\022\021.mlflow.DeleteTag\032" +
-      "\032.mlflow.DeleteTag.Response\"9\362\206\0315\n%\n\004POS" +
-      "T\022\027/mlflow/runs/delete-tag\032\004\010\002\020\000\020\001*\nDele" +
-      "te Tag\022a\n\006getRun\022\016.mlflow.GetRun\032\027.mlflo" +
-      "w.GetRun.Response\".\362\206\031*\n\035\n\003GET\022\020/mlflow/" +
-      "runs/get\032\004\010\002\020\000\020\001*\007Get Run\022u\n\nsearchRuns\022" +
-      "\022.mlflow.SearchRuns\032\033.mlflow.SearchRuns." +
-      "Response\"6\362\206\0312\n!\n\004POST\022\023/mlflow/runs/sea" +
-      "rch\032\004\010\002\020\000\020\001*\013Search Runs\022\203\001\n\rlistArtifac" +
-      "ts\022\025.mlflow.ListArtifacts\032\036.mlflow.ListA" +
-      "rtifacts.Response\";\362\206\0317\n#\n\003GET\022\026/mlflow/" +
-      "artifacts/list\032\004\010\002\020\000\020\001*\016List Artifacts\022\225" +
-      "\001\n\020getMetricHistory\022\030.mlflow.GetMetricHi" +
-      "story\032!.mlflow.GetMetricHistory.Response" +
-      "\"D\362\206\031@\n(\n\003GET\022\033/mlflow/metrics/get-histo" +
-      "ry\032\004\010\002\020\000\020\001*\022Get Metric History\022p\n\010logBat" +
-      "ch\022\020.mlflow.LogBatch\032\031.mlflow.LogBatch.R" +
-      "esponse\"7\362\206\0313\n$\n\004POST\022\026/mlflow/runs/log-" +
-      "batch\032\004\010\002\020\000\020\001*\tLog Batch\022p\n\010logModel\022\020.m" +
-      "lflow.LogModel\032\031.mlflow.LogModel.Respons" +
-      "e\"7\362\206\0313\n$\n\004POST\022\026/mlflow/runs/log-model\032" +
-      "\004\010\002\020\000\020\001*\tLog Model\022w\n\014getAuthToken\022\024.mlf" +
-      "low.GetAuthToken\032\035.mlflow.GetAuthToken.R" +
-      "esponse\"2\362\206\031.\n\032\n\004POST\022\014/mlflow/auth\032\004\010\002\020" +
-      "\000\020\001*\016Get Auth TokenB\036\n\024org.mlflow.api.pr" +
-      "oto\220\001\001\342?\002\020\001"
+      "\242\001\n\014GetAuthToken\022\026\n\010username\030\001 \001(\tB\004\370\206\031\001" +
+      "\022\026\n\010password\030\002 \001(\tB\004\370\206\031\001\022\026\n\010team_ids\030\003 \003" +
+      "(\005B\004\370\206\031\001\032\035\n\010Response\022\021\n\tjwt_token\030\001 \001(\t:" +
+      "+\342?(\n&com.databricks.rpc.RPC[$this.Respo" +
+      "nse]*6\n\010ViewType\022\017\n\013ACTIVE_ONLY\020\001\022\020\n\014DEL" +
+      "ETED_ONLY\020\002\022\007\n\003ALL\020\003*I\n\nSourceType\022\014\n\010NO" +
+      "TEBOOK\020\001\022\007\n\003JOB\020\002\022\013\n\007PROJECT\020\003\022\t\n\005LOCAL\020" +
+      "\004\022\014\n\007UNKNOWN\020\350\007*M\n\tRunStatus\022\013\n\007RUNNING\020" +
+      "\001\022\r\n\tSCHEDULED\020\002\022\014\n\010FINISHED\020\003\022\n\n\006FAILED" +
+      "\020\004\022\n\n\006KILLED\020\0052\372\027\n\rMlflowService\022\246\001\n\023get" +
+      "ExperimentByName\022\033.mlflow.GetExperimentB" +
+      "yName\032$.mlflow.GetExperimentByName.Respo" +
+      "nse\"L\362\206\031H\n,\n\003GET\022\037/mlflow/experiments/ge" +
+      "t-by-name\032\004\010\002\020\000\020\001*\026Get Experiment By Nam" +
+      "e\022\224\001\n\020createExperiment\022\030.mlflow.CreateEx" +
+      "periment\032!.mlflow.CreateExperiment.Respo" +
+      "nse\"C\362\206\031?\n(\n\004POST\022\032/mlflow/experiments/c" +
+      "reate\032\004\010\002\020\000\020\001*\021Create Experiment\022\301\001\n\021sea" +
+      "rchExperiments\022\031.mlflow.SearchExperiment" +
+      "s\032\".mlflow.SearchExperiments.Response\"m\362" +
+      "\206\031i\n(\n\004POST\022\032/mlflow/experiments/search\032" +
+      "\004\010\002\020\000\n\'\n\003GET\022\032/mlflow/experiments/search" +
+      "\032\004\010\002\020\000\020\001*\022Search Experiments\022\204\001\n\rgetExpe" +
+      "riment\022\025.mlflow.GetExperiment\032\036.mlflow.G" +
+      "etExperiment.Response\"<\362\206\0318\n$\n\003GET\022\027/mlf" +
+      "low/experiments/get\032\004\010\002\020\000\020\001*\016Get Experim" +
+      "ent\022\224\001\n\020deleteExperiment\022\030.mlflow.Delete" +
+      "Experiment\032!.mlflow.DeleteExperiment.Res" +
+      "ponse\"C\362\206\031?\n(\n\004POST\022\032/mlflow/experiments" +
+      "/delete\032\004\010\002\020\000\020\001*\021Delete Experiment\022\231\001\n\021r" +
+      "estoreExperiment\022\031.mlflow.RestoreExperim" +
+      "ent\032\".mlflow.RestoreExperiment.Response\"" +
+      "E\362\206\031A\n)\n\004POST\022\033/mlflow/experiments/resto" +
+      "re\032\004\010\002\020\000\020\001*\022Restore Experiment\022\224\001\n\020updat" +
+      "eExperiment\022\030.mlflow.UpdateExperiment\032!." +
+      "mlflow.UpdateExperiment.Response\"C\362\206\031?\n(" +
+      "\n\004POST\022\032/mlflow/experiments/update\032\004\010\002\020\000" +
+      "\020\001*\021Update Experiment\022q\n\tcreateRun\022\021.mlf" +
+      "low.CreateRun\032\032.mlflow.CreateRun.Respons" +
+      "e\"5\362\206\0311\n!\n\004POST\022\023/mlflow/runs/create\032\004\010\002" +
+      "\020\000\020\001*\nCreate Run\022q\n\tupdateRun\022\021.mlflow.U" +
+      "pdateRun\032\032.mlflow.UpdateRun.Response\"5\362\206" +
+      "\0311\n!\n\004POST\022\023/mlflow/runs/update\032\004\010\002\020\000\020\001*" +
+      "\nUpdate Run\022q\n\tdeleteRun\022\021.mlflow.Delete" +
+      "Run\032\032.mlflow.DeleteRun.Response\"5\362\206\0311\n!\n" +
+      "\004POST\022\023/mlflow/runs/delete\032\004\010\002\020\000\020\001*\nDele" +
+      "te Run\022v\n\nrestoreRun\022\022.mlflow.RestoreRun" +
+      "\032\033.mlflow.RestoreRun.Response\"7\362\206\0313\n\"\n\004P" +
+      "OST\022\024/mlflow/runs/restore\032\004\010\002\020\000\020\001*\013Resto" +
+      "re Run\022u\n\tlogMetric\022\021.mlflow.LogMetric\032\032" +
+      ".mlflow.LogMetric.Response\"9\362\206\0315\n%\n\004POST" +
+      "\022\027/mlflow/runs/log-metric\032\004\010\002\020\000\020\001*\nLog M" +
+      "etric\022t\n\010logParam\022\020.mlflow.LogParam\032\031.ml" +
+      "flow.LogParam.Response\";\362\206\0317\n(\n\004POST\022\032/m" +
+      "lflow/runs/log-parameter\032\004\010\002\020\000\020\001*\tLog Pa" +
+      "ram\022\241\001\n\020setExperimentTag\022\030.mlflow.SetExp" +
+      "erimentTag\032!.mlflow.SetExperimentTag.Res" +
+      "ponse\"P\362\206\031L\n4\n\004POST\022&/mlflow/experiments" +
+      "/set-experiment-tag\032\004\010\002\020\000\020\001*\022Set Experim" +
+      "ent Tag\022f\n\006setTag\022\016.mlflow.SetTag\032\027.mlfl" +
+      "ow.SetTag.Response\"3\362\206\031/\n\"\n\004POST\022\024/mlflo" +
+      "w/runs/set-tag\032\004\010\002\020\000\020\001*\007Set Tag\022u\n\tdelet" +
+      "eTag\022\021.mlflow.DeleteTag\032\032.mlflow.DeleteT" +
+      "ag.Response\"9\362\206\0315\n%\n\004POST\022\027/mlflow/runs/" +
+      "delete-tag\032\004\010\002\020\000\020\001*\nDelete Tag\022a\n\006getRun" +
+      "\022\016.mlflow.GetRun\032\027.mlflow.GetRun.Respons" +
+      "e\".\362\206\031*\n\035\n\003GET\022\020/mlflow/runs/get\032\004\010\002\020\000\020\001" +
+      "*\007Get Run\022u\n\nsearchRuns\022\022.mlflow.SearchR" +
+      "uns\032\033.mlflow.SearchRuns.Response\"6\362\206\0312\n!" +
+      "\n\004POST\022\023/mlflow/runs/search\032\004\010\002\020\000\020\001*\013Sea" +
+      "rch Runs\022\203\001\n\rlistArtifacts\022\025.mlflow.List" +
+      "Artifacts\032\036.mlflow.ListArtifacts.Respons" +
+      "e\";\362\206\0317\n#\n\003GET\022\026/mlflow/artifacts/list\032\004" +
+      "\010\002\020\000\020\001*\016List Artifacts\022\225\001\n\020getMetricHist" +
+      "ory\022\030.mlflow.GetMetricHistory\032!.mlflow.G" +
+      "etMetricHistory.Response\"D\362\206\031@\n(\n\003GET\022\033/" +
+      "mlflow/metrics/get-history\032\004\010\002\020\000\020\001*\022Get " +
+      "Metric History\022p\n\010logBatch\022\020.mlflow.LogB" +
+      "atch\032\031.mlflow.LogBatch.Response\"7\362\206\0313\n$\n" +
+      "\004POST\022\026/mlflow/runs/log-batch\032\004\010\002\020\000\020\001*\tL" +
+      "og Batch\022p\n\010logModel\022\020.mlflow.LogModel\032\031" +
+      ".mlflow.LogModel.Response\"7\362\206\0313\n$\n\004POST\022" +
+      "\026/mlflow/runs/log-model\032\004\010\002\020\000\020\001*\tLog Mod" +
+      "el\022w\n\014getAuthToken\022\024.mlflow.GetAuthToken" +
+      "\032\035.mlflow.GetAuthToken.Response\"2\362\206\031.\n\032\n" +
+      "\004POST\022\014/mlflow/auth\032\004\010\002\020\000\020\001*\016Get Auth To" +
+      "kenB\036\n\024org.mlflow.api.proto\220\001\001\342?\002\020\001"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -53099,7 +53326,7 @@ public final class Service {
     internal_static_mlflow_GetAuthToken_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_mlflow_GetAuthToken_descriptor,
-        new java.lang.String[] { "Username", "Password", });
+        new java.lang.String[] { "Username", "Password", "TeamIds", });
     internal_static_mlflow_GetAuthToken_Response_descriptor =
       internal_static_mlflow_GetAuthToken_descriptor.getNestedTypes().get(0);
     internal_static_mlflow_GetAuthToken_Response_fieldAccessorTable = new

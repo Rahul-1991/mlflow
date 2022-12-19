@@ -404,7 +404,7 @@ service MlflowService {
     };
   }
 
-  // Return user data encoded as jwt. Takes username and password as api request
+  // Return user data encoded as jwt. Takes username, password and team list to which the user belongs as api request
   rpc getAuthToken (GetAuthToken) returns (GetAuthToken.Response) {
       option (rpc) = {
           endpoints: [{
@@ -1043,8 +1043,11 @@ message GetAuthToken {
 
   // Username of the registered user
   optional string username = 1 [(validate_required) = true];
-  // password of the registered user.
+  // password of the registered user
   optional string password = 2 [(validate_required) = true];
+  // List of team ids to which user belongs
+  repeated int32 team_ids = 3 [(validate_required) = true];
+
 
   message Response {
     // user data encoded as jwt
