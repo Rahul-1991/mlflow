@@ -61,6 +61,7 @@ from mlflow.utils.validation import (
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
 from mlflow.utils.time_utils import get_current_time_millis
 from mlflow.utils.decorators import authorise_class_methods
+from flask import request
 
 _logger = logging.getLogger(__name__)
 
@@ -119,6 +120,7 @@ class SqlAlchemyStore(AbstractStore):
         self.db_uri = db_uri
         self.db_type = extract_db_type_from_uri(db_uri)
         self.artifact_root_uri = default_artifact_root
+        self.jwt_token = request.headers.get('Jwt')
         # Quick check to see if the respective SQLAlchemy database engine has already been created.
         if db_uri not in SqlAlchemyStore._db_uri_sql_alchemy_engine_map:
             with SqlAlchemyStore._db_uri_sql_alchemy_engine_map_lock:

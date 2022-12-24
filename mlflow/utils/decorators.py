@@ -9,15 +9,14 @@ from mlflow.utils.auth_utils import is_operation_allowed, assign_resource_to_use
 def perform_authorization(func):
     @wraps(func)
     def wrapper(self, *args, **kw):
-        jwt_data = get_decrypted_jwt_data(request.headers.get('jwt'))
-        try:
-            user_role = json.loads(jwt_data.get('role'))
-        except Exception as e:
-            user_role = dict()
-        # user_role = {'PV': {'experiment': ["exp2", "exp3"]}}
         if func.__name__.startswith('_'):
             return func(self, *args, **kw)
-        func_arguments, variable_arguments, keywords, defaults = inspect.getargspec(func)
+        jwt_data = get_decrypted_jwt_data(self.jwt_token)
+        user_role = jwt_data.get('role') or dict()
+        try:
+            func_arguments, variable_arguments, keywords, defaults = inspect.getargspec(func)
+        except Exception as e:
+            func_arguments = inspect.signature(func).parameters.keys()
         experiment_param = None
         for index, param in enumerate(func_arguments):
             if param == 'experiment_id' or param == 'experiment_name':

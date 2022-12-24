@@ -1,6 +1,8 @@
 import jwt
 import inspect
 from flask import request
+from mlflow.exceptions import MlflowException
+from mlflow.protos.databricks_pb2 import PERMISSION_DENIED
 from mlflow.utils.user_role_access import role_access_map
 from mlflow.utils.constants import ACTIONS, DEFAULT_ALLOCATED_ROLE, SYSTEM_ADMIN_ROLE, JWT_SECRET_KEY, JWT_ENCRYPTION_ALGORITHM
 
@@ -59,4 +61,7 @@ def is_operation_allowed(user_role, func_name, func_params):
 
 
 def get_decrypted_jwt_data(token):
-    return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ENCRYPTION_ALGORITHM])
+    try:
+        return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ENCRYPTION_ALGORITHM])
+    except Exception as e:
+        raise MlflowException('Invalid jwt token', error_code=PERMISSION_DENIED)

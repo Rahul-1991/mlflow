@@ -33,6 +33,7 @@ from mlflow.utils.databricks_utils import get_databricks_run_url
 from mlflow.utils.logging_utils import eprint
 from mlflow.utils.uri import is_databricks_uri
 from mlflow.utils.validation import _validate_model_version_or_stage_exists
+from mlflow.utils.decorators import authorise_class_methods
 
 if TYPE_CHECKING:
     import matplotlib  # pylint: disable=unused-import
@@ -43,6 +44,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
+@authorise_class_methods()
 class MlflowClient:
     """
     Client of an MLflow Tracking Server that creates and manages experiments and runs, and of an
@@ -51,7 +53,7 @@ class MlflowClient:
     can keep the implementation of the tracking and registry clients independent from each other.
     """
 
-    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None):
+    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None, jwt_token: Optional[str] = None):
         """
         :param tracking_uri: Address of local or remote tracking server. If not provided, defaults
                              to the service set by ``mlflow.tracking.set_tracking_uri``. See
@@ -64,6 +66,7 @@ class MlflowClient:
         final_tracking_uri = utils._resolve_tracking_uri(tracking_uri)
         self._registry_uri = registry_utils._resolve_registry_uri(registry_uri, tracking_uri)
         self._tracking_client = TrackingServiceClient(final_tracking_uri)
+        self.jwt_token = jwt_token
         # `MlflowClient` also references a `ModelRegistryClient` instance that is provided by the
         # `MlflowClient._get_registry_client()` method. This `ModelRegistryClient` is not explicitly
         # defined as an instance variable in the `MlflowClient` constructor; an instance variable
