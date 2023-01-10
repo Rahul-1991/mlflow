@@ -11,7 +11,7 @@ def perform_authorization(func):
     def wrapper(self, *args, **kw):
         if func.__name__.startswith('_'):
             return func(self, *args, **kw)
-        jwt_data = get_decrypted_jwt_data(self.jwt_token)
+        jwt_data = get_decrypted_jwt_data(self.jwt_auth_token)
         user_role = jwt_data.get('role') or dict()
         try:
             func_arguments, variable_arguments, keywords, defaults = inspect.getargspec(func)

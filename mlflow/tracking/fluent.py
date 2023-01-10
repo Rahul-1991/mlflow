@@ -1055,10 +1055,12 @@ def search_experiments(
     max_results: Optional[int] = None,
     filter_string: Optional[str] = None,
     order_by: Optional[List[str]] = None,
+    jwt_token: Optional[str] = None
 ) -> List[Experiment]:
     """
     Search for experiments that match the specified search query.
 
+    :param jwt_token: jwt token containing access levels of user
     :param view_type: One of enum values ``ACTIVE_ONLY``, ``DELETED_ONLY``, or ``ALL``
                       defined in :py:class:`mlflow.entities.ViewType`.
     :param max_results: If passed, specifies the maximum number of experiments desired. If not
@@ -1152,7 +1154,7 @@ def search_experiments(
     """
 
     def pagination_wrapper_func(number_to_get, next_page_token):
-        return MlflowClient().search_experiments(
+        return MlflowClient(jwt_token=jwt_token).search_experiments(
             view_type=view_type,
             max_results=number_to_get,
             filter_string=filter_string,

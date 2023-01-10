@@ -39,11 +39,12 @@ class TrackingServiceClient:
 
     _artifact_repos_cache = OrderedDict()
 
-    def __init__(self, tracking_uri):
+    def __init__(self, tracking_uri, jwt_token=None):
         """
         :param tracking_uri: Address of local or remote tracking server.
         """
         self.tracking_uri = tracking_uri
+        self.jwt_token = jwt_token
         # NB: Fetch the tracking store (`self.store`) upon client initialization to ensure that
         # the tracking URI is valid and the store can be properly resolved. We define `store` as a
         # property method to ensure that the client is serializable, even if the store is not
@@ -52,7 +53,9 @@ class TrackingServiceClient:
 
     @property
     def store(self):
-        return utils._get_store(self.tracking_uri)
+        result = utils._get_store(self.tracking_uri)
+        result._set_jwt_auth_token(self.jwt_token)
+        return result
 
     def get_run(self, run_id):
         """

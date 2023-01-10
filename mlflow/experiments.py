@@ -1,7 +1,5 @@
 import os
-
 import click
-
 import mlflow
 from mlflow.data import is_uri
 from mlflow.entities import ViewType
@@ -32,7 +30,8 @@ def commands():
     "more info on the properties of artifact location. "
     "If no location is provided, the tracking server will pick a default.",
 )
-def create(experiment_name, artifact_location):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+def create(experiment_name, artifact_location, jwt_auth_token):
     """
     Create an experiment.
 
@@ -44,6 +43,7 @@ def create(experiment_name, artifact_location):
     as subfolders.
     """
     store = _get_store()
+    store._set_jwt_auth_token(jwt_auth_token)
     exp_id = store.create_experiment(experiment_name, artifact_location)
     click.echo("Created experiment '%s' with id %s" % (experiment_name, exp_id))
 
@@ -56,12 +56,15 @@ def create(experiment_name, artifact_location):
     help="Select view type for experiments. Valid view types are "
     "'active_only' (default), 'deleted_only', and 'all'.",
 )
-def search_experiments(view):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+def search_experiments(view, jwt_auth_token):
     """
     Search for experiments in the configured tracking server.
     """
     view_type = ViewType.from_string(view) if view else ViewType.ACTIVE_ONLY
-    experiments = mlflow.search_experiments(view_type=view_type)
+    experiments = mlflow.search_experiments(view_type=view_type, jwt_token=jwt_auth_token)
+    jwt_data = get_decrypted_jwt_data(jwt_auth_token)
+    accessible_experiments = [exp for access, role in jwt_data.get('role').items() for exp in role.get('experiment')]
     table = [
         [
             exp.experiment_id,
@@ -70,14 +73,15 @@ def search_experiments(view):
             if is_uri(exp.artifact_location)
             else os.path.abspath(exp.artifact_location),
         ]
-        for exp in experiments
+        for exp in experiments if exp.name in accessible_experiments
     ]
     click.echo(_create_table(sorted(table), headers=["Experiment Id", "Name", "Artifact Location"]))
 
 
 @commands.command("delete")
 @EXPERIMENT_ID
-def delete_experiment(experiment_id):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+def delete_experiment(experiment_id, jwt_auth_token):
     """
     Mark an active experiment for deletion. This also applies to experiment's metadata, runs and
     associated data, and artifacts if they are store in default location. Use ``list`` command to
@@ -94,19 +98,22 @@ def delete_experiment(experiment_id):
     workflow mechanism to clear ``.trash`` folder.
     """
     store = _get_store()
+    store._set_jwt_auth_token(jwt_auth_token)
     store.delete_experiment(experiment_id)
     click.echo("Experiment with ID %s has been deleted." % str(experiment_id))
 
 
 @commands.command("restore")
 @EXPERIMENT_ID
-def restore_experiment(experiment_id):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+def restore_experiment(experiment_id, jwt_auth_token):
     """
     Restore a deleted experiment. This also applies to experiment's metadata, runs and associated
     data. The command throws an error if the experiment is already active, cannot be found, or
     permanently deleted.
     """
     store = _get_store()
+    store._set_jwt_auth_token(jwt_auth_token)
     store.restore_experiment(experiment_id)
     click.echo("Experiment with id %s has been restored." % str(experiment_id))
 
@@ -114,12 +121,14 @@ def restore_experiment(experiment_id):
 @commands.command("rename")
 @EXPERIMENT_ID
 @click.option("--new-name", type=click.STRING, required=True)
-def rename_experiment(experiment_id, new_name):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+def rename_experiment(experiment_id, new_name, jwt_auth_token):
     """
     Renames an active experiment.
     Returns an error if the experiment is inactive.
     """
     store = _get_store()
+    store._set_jwt_auth_token(jwt_auth_token)
     store.rename_experiment(experiment_id, new_name)
     click.echo("Experiment with id %s has been renamed to '%s'." % (experiment_id, new_name))
 

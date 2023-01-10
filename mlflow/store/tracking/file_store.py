@@ -78,6 +78,7 @@ from mlflow.utils.string_utils import is_string_type
 from mlflow.utils.time_utils import get_current_time_millis
 from mlflow.utils.uri import append_to_uri_path
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
+from mlflow.utils.decorators import authorise_class_methods
 
 _TRACKING_DIR_ENV_VAR = "MLFLOW_TRACKING_DIR"
 
@@ -130,6 +131,7 @@ def _read_persisted_run_info_dict(run_info_dict):
     return RunInfo.from_dictionary(dict_copy)
 
 
+@authorise_class_methods()
 class FileStore(AbstractStore):
     TRASH_FOLDER_NAME = ".trash"
     ARTIFACTS_FOLDER_NAME = "artifacts"
@@ -141,11 +143,12 @@ class FileStore(AbstractStore):
     META_DATA_FILE_NAME = "meta.yaml"
     DEFAULT_EXPERIMENT_ID = "0"
 
-    def __init__(self, root_directory=None, artifact_root_uri=None):
+    def __init__(self, root_directory=None, artifact_root_uri=None, jwt_token=None):
         """
         Create a new FileStore with the given root directory and a given default artifact root URI.
         """
         super().__init__()
+        self.jwt_token = jwt_token
         self.root_directory = local_file_uri_to_path(root_directory or _default_root_dir())
         self.artifact_root_uri = artifact_root_uri or path_to_local_file_uri(self.root_directory)
         self.trash_folder = os.path.join(self.root_directory, FileStore.TRASH_FOLDER_NAME)
@@ -1055,3 +1058,6 @@ class FileStore(AbstractStore):
                 return _read_helper(root, file_name, attempts_remaining - 1)
 
         return _read_helper(root, file_name, attempts_remaining=retries)
+
+    def _set_jwt_auth_token(self, jwt_token):
+        self.jwt_auth_token = jwt_token

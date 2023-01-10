@@ -65,8 +65,8 @@ class MlflowClient:
         """
         final_tracking_uri = utils._resolve_tracking_uri(tracking_uri)
         self._registry_uri = registry_utils._resolve_registry_uri(registry_uri, tracking_uri)
-        self._tracking_client = TrackingServiceClient(final_tracking_uri)
-        self.jwt_token = jwt_token
+        self.jwt_auth_token = jwt_token
+        self._tracking_client = TrackingServiceClient(final_tracking_uri, jwt_token)
         # `MlflowClient` also references a `ModelRegistryClient` instance that is provided by the
         # `MlflowClient._get_registry_client()` method. This `ModelRegistryClient` is not explicitly
         # defined as an instance variable in the `MlflowClient` constructor; an instance variable

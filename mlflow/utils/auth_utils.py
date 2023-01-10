@@ -19,9 +19,9 @@ def assign_resource_to_user(user_role, resource_id, func_name, class_obj):
                 accessible_resources = user_role.get(DEFAULT_ALLOCATED_ROLE, {}).get(action)
                 accessible_resources.append(resource_id)
                 user_role.get(DEFAULT_ALLOCATED_ROLE).update({action: accessible_resources})
-        with class_obj.ManagedSessionMaker() as session:
-            session.query(SqlUser).filter(SqlUser.id == resource_id).update({'role': json.dumps(user_role)})
-            session.flush()
+        # with class_obj.ManagedSessionMaker() as session:
+        #     session.query(SqlUser).filter(SqlUser.id == resource_id).update({'role': json.dumps(user_role)})
+        #     session.flush()
 
 
 def _user_has_access(user_role, user_action, resource):
