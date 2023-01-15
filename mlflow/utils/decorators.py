@@ -6,27 +6,41 @@ from mlflow.protos.databricks_pb2 import PERMISSION_DENIED
 from mlflow.utils.auth_utils import is_operation_allowed, assign_resource_to_user, get_decrypted_jwt_data
 
 
+# def perform_authorization(func):
+#     @wraps(func)
+#     def wrapper(self, *args, **kw):
+#         if func.__name__.startswith('_'):
+#             return func(self, *args, **kw)
+#         jwt_data = get_decrypted_jwt_data(self.jwt_auth_token)
+#         user_role = jwt_data.get('role') or dict()
+#         try:
+#             func_arguments, variable_arguments, keywords, defaults = inspect.getargspec(func)
+#         except Exception as e:
+#             func_arguments = inspect.signature(func).parameters.keys()
+#         experiment_param = None
+#         for index, param in enumerate(func_arguments):
+#             if param == 'experiment_id' or param == 'experiment_name':
+#                 experiment_param = args[index - 1]
+#         if is_operation_allowed(user_role, func.__name__, experiment_param):
+#             if 'create' in func.__name__:
+#                 resource_id = func(self, *args, **kw)
+#                 assign_resource_to_user(user_role, resource_id, func.__name__, self)
+#                 return resource_id
+#             return func(self, *args, **kw)
+#         raise MlflowException('Access Denied for {} function'.format(func.__name__), error_code=PERMISSION_DENIED)
+#     return wrapper
+
+
 def perform_authorization(func):
+
     @wraps(func)
-    def wrapper(self, *args, **kw):
+    def wrapper(self, *args, **kwargs):
         if func.__name__.startswith('_'):
-            return func(self, *args, **kw)
+            return func(self, *args, **kwargs)
         jwt_data = get_decrypted_jwt_data(self.jwt_auth_token)
-        user_role = jwt_data.get('role') or dict()
-        try:
-            func_arguments, variable_arguments, keywords, defaults = inspect.getargspec(func)
-        except Exception as e:
-            func_arguments = inspect.signature(func).parameters.keys()
-        experiment_param = None
-        for index, param in enumerate(func_arguments):
-            if param == 'experiment_id' or param == 'experiment_name':
-                experiment_param = args[index - 1]
-        if is_operation_allowed(user_role, func.__name__, experiment_param):
-            if 'create' in func.__name__:
-                resource_id = func(self, *args, **kw)
-                assign_resource_to_user(user_role, resource_id, func.__name__, self)
-                return resource_id
-            return func(self, *args, **kw)
+        team_roles = jwt_data.get('teams') or dict()
+        if is_operation_allowed(team_roles, func.__name__):
+            return func(self, *args, **kwargs)
         raise MlflowException('Access Denied for {} function'.format(func.__name__), error_code=PERMISSION_DENIED)
     return wrapper
 

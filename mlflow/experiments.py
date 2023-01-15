@@ -5,6 +5,7 @@ from mlflow.data import is_uri
 from mlflow.entities import ViewType
 from mlflow.tracking import _get_store, fluent
 from mlflow.utils.string_utils import _create_table
+from mlflow.utils.auth_utils import get_decrypted_jwt_data
 
 
 EXPERIMENT_ID = click.option("--experiment-id", "-x", type=click.STRING, required=True)
