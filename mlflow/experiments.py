@@ -32,7 +32,8 @@ def commands():
     "more info on the properties of artifact location. "
     "If no location is provided, the tracking server will pick a default.",
 )
-def create(experiment_name, artifact_location):
+@click.option("--team-id", type=click.STRING, required=True)
+def create(experiment_name, artifact_location, team_id):
     """
     Create an experiment.
 
@@ -44,7 +45,7 @@ def create(experiment_name, artifact_location):
     as subfolders.
     """
     store = _get_store()
-    exp_id = store.create_experiment(experiment_name, artifact_location)
+    exp_id = store.create_experiment(experiment_name, artifact_location, team_id)
     click.echo("Created experiment '%s' with id %s" % (experiment_name, exp_id))
 
 
