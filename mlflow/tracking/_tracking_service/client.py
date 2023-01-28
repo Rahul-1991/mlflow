@@ -196,7 +196,7 @@ class TrackingServiceClient:
         """
         return self.store.get_experiment_by_name(name)
 
-    def create_experiment(self, name, artifact_location=None, tags=None):
+    def create_experiment(self, name, artifact_location=None, tags=None, team_id=None):
         """Create an experiment.
 
         :param name: The experiment name. Must be unique.
@@ -212,6 +212,7 @@ class TrackingServiceClient:
             name=name,
             artifact_location=artifact_location,
             tags=[ExperimentTag(key, value) for (key, value) in tags.items()] if tags else [],
+            team_id=team_id
         )
 
     def delete_experiment(self, experiment_id):

@@ -455,6 +455,7 @@ class MlflowClient:
         name: str,
         artifact_location: Optional[str] = None,
         tags: Optional[Dict[str, Any]] = None,
+        team_id: Optional[str] = None
     ) -> str:
         """Create an experiment.
 
@@ -464,6 +465,7 @@ class MlflowClient:
         :param tags: A dictionary of key-value pairs that are converted into
                                 :py:class:`mlflow.entities.ExperimentTag` objects, set as
                                 experiment tags upon experiment creation.
+        :param team_id: Team id under which the experiment is created.
         :return: String as an integer ID of the created experiment.
 
         .. code-block:: python
@@ -498,7 +500,7 @@ class MlflowClient:
             Tags: {'version': 'v1', 'priority': 'P1', 'nlp.framework': 'Spark NLP'}
             Lifecycle_stage: active
         """
-        return self._tracking_client.create_experiment(name, artifact_location, tags)
+        return self._tracking_client.create_experiment(name, artifact_location, tags, team_id)
 
     def delete_experiment(self, experiment_id: str) -> None:
         """
