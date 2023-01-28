@@ -33,6 +33,7 @@ from mlflow.utils.databricks_utils import get_databricks_run_url
 from mlflow.utils.logging_utils import eprint
 from mlflow.utils.uri import is_databricks_uri
 from mlflow.utils.validation import _validate_model_version_or_stage_exists
+from mlflow.utils.auth_utils import get_authorised_teams
 
 if TYPE_CHECKING:
     import matplotlib  # pylint: disable=unused-import
@@ -51,7 +52,7 @@ class MlflowClient:
     can keep the implementation of the tracking and registry clients independent from each other.
     """
 
-    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None):
+    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None, jwt_auth_token: Optional[str] = None):
         """
         :param tracking_uri: Address of local or remote tracking server. If not provided, defaults
                              to the service set by ``mlflow.tracking.set_tracking_uri``. See
@@ -64,6 +65,7 @@ class MlflowClient:
         final_tracking_uri = utils._resolve_tracking_uri(tracking_uri)
         self._registry_uri = registry_utils._resolve_registry_uri(registry_uri, tracking_uri)
         self._tracking_client = TrackingServiceClient(final_tracking_uri)
+        self._jwt_auth_token = jwt_auth_token
         # `MlflowClient` also references a `ModelRegistryClient` instance that is provided by the
         # `MlflowClient._get_registry_client()` method. This `ModelRegistryClient` is not explicitly
         # defined as an instance variable in the `MlflowClient` constructor; an instance variable
@@ -377,13 +379,13 @@ class MlflowClient:
             experiments = client.search_experiments(order_by=["experiment_id DESC"])
             assert_experiment_names_equal(experiments, ["bb", "ab", "b", "a"])
         """
-        return self._tracking_client.search_experiments(
+        return PagedList([experiment for experiment in self._tracking_client.search_experiments(
             view_type=view_type,
             max_results=max_results,
             filter_string=filter_string,
             order_by=order_by,
             page_token=page_token,
-        )
+        ) if experiment.team_id and experiment.team_id in get_authorised_teams(self._jwt_auth_token)], page_token)
 
     def get_experiment(self, experiment_id: str) -> Experiment:
         """
