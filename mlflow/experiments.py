@@ -45,7 +45,7 @@ def create(experiment_name, artifact_location, team_id):
     as subfolders.
     """
     store = _get_store()
-    exp_id = store.create_experiment(experiment_name, artifact_location, team_id)
+    exp_id = store.create_experiment(experiment_name, artifact_location, team_id=team_id)
     click.echo("Created experiment '%s' with id %s" % (experiment_name, exp_id))
 
 
