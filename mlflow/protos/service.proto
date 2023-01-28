@@ -574,6 +574,9 @@ message Experiment {
 
   // Tags: Additional metadata key-value pairs.
   repeated ExperimentTag tags = 7;
+
+  // Team id representing the team which own the created experiment
+  optional string team_id = 8;
 }
 
 message CreateExperiment {

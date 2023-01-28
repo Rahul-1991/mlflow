@@ -22,6 +22,7 @@ class Experiment(_MLflowObject):
         tags=None,
         creation_time=None,
         last_update_time=None,
+        team_id=None
     ):
         super().__init__()
         self._experiment_id = experiment_id
@@ -31,6 +32,7 @@ class Experiment(_MLflowObject):
         self._tags = {tag.key: tag.value for tag in (tags or [])}
         self._creation_time = creation_time
         self._last_update_time = last_update_time
+        self._team_id = team_id
 
     @property
     def experiment_id(self):
@@ -77,6 +79,10 @@ class Experiment(_MLflowObject):
     def _set_last_update_time(self, last_update_time):
         self._last_update_time = last_update_time
 
+    @property
+    def team_id(self):
+        return self._team_id
+
     @classmethod
     def from_proto(cls, proto):
         experiment = cls(
@@ -90,6 +96,7 @@ class Experiment(_MLflowObject):
             # `last_update_time` if they are non-zero.
             creation_time=proto.creation_time or None,
             last_update_time=proto.last_update_time or None,
+            team_id=proto.team_id or None
         )
         for proto_tag in proto.tags:
             experiment._add_tag(ExperimentTag.from_proto(proto_tag))
@@ -105,6 +112,8 @@ class Experiment(_MLflowObject):
             experiment.creation_time = self.creation_time
         if self.last_update_time:
             experiment.last_update_time = self.last_update_time
+        if self.team_id:
+            experiment.team_id = self.team_id
         experiment.tags.extend(
             [ProtoExperimentTag(key=key, value=val) for key, val in self._tags.items()]
         )
