@@ -18,7 +18,7 @@ from mlflow.store.entities.paged_list import PagedList
 from mlflow.entities.model_registry import RegisteredModel, ModelVersion
 from mlflow.entities.model_registry.model_version_stages import ALL_STAGES
 from mlflow.exceptions import MlflowException
-from mlflow.protos.databricks_pb2 import FEATURE_DISABLED
+from mlflow.protos.databricks_pb2 import FEATURE_DISABLED, RESOURCE_DOES_NOT_EXIST
 from mlflow.store.model_registry import SEARCH_REGISTERED_MODEL_MAX_RESULTS_DEFAULT
 from mlflow.store.tracking import SEARCH_MAX_RESULTS_DEFAULT
 from mlflow.tracking._model_registry.client import ModelRegistryClient
@@ -417,7 +417,12 @@ class MlflowClient:
             Artifact Location: file:///.../mlruns/1
             Lifecycle_stage: active
         """
-        return self._tracking_client.get_experiment(experiment_id)
+        experiment = self._tracking_client.get_experiment(experiment_id)
+        if experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
+            raise MlflowException(
+                "Could not find experiment with ID %s" % experiment_id, RESOURCE_DOES_NOT_EXIST
+            )
+        return experiment
 
     def get_experiment_by_name(self, name: str) -> Optional[Experiment]:
         """
@@ -450,7 +455,12 @@ class MlflowClient:
             Artifact Location: file:///.../mlruns/0
             Lifecycle_stage: active
         """
-        return self._tracking_client.get_experiment_by_name(name)
+        experiment = self._tracking_client.get_experiment_by_name(name)
+        if experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
+            raise MlflowException(
+                "Could not find experiment with name %s" % name, RESOURCE_DOES_NOT_EXIST
+            )
+        return experiment
 
     def create_experiment(
         self,
