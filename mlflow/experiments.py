@@ -1,12 +1,11 @@
 import os
-
 import click
-
 import mlflow
 from mlflow.data import is_uri
 from mlflow.entities import ViewType
 from mlflow.tracking import _get_store, fluent
 from mlflow.utils.string_utils import _create_table
+from mlflow.utils.auth_utils import get_authorised_teams
 
 
 EXPERIMENT_ID = click.option("--experiment-id", "-x", type=click.STRING, required=True)
@@ -57,7 +56,9 @@ def create(experiment_name, artifact_location, team_id):
     help="Select view type for experiments. Valid view types are "
     "'active_only' (default), 'deleted_only', and 'all'.",
 )
-def search_experiments(view):
+@click.option("--jwt-auth-token", type=click.STRING, required=True)
+@click.option("--team-id", type=click.STRING, required=True)
+def search_experiments(view, jwt_token, team_id):
     """
     Search for experiments in the configured tracking server.
     """
@@ -71,7 +72,7 @@ def search_experiments(view):
             if is_uri(exp.artifact_location)
             else os.path.abspath(exp.artifact_location),
         ]
-        for exp in experiments
+        for exp in experiments if exp.team_id and exp.team_id in get_authorised_teams(jwt_token)
     ]
     click.echo(_create_table(sorted(table), headers=["Experiment Id", "Name", "Artifact Location"]))
 
