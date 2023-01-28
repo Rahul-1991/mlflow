@@ -57,8 +57,7 @@ def create(experiment_name, artifact_location, team_id):
     "'active_only' (default), 'deleted_only', and 'all'.",
 )
 @click.option("--jwt-auth-token", type=click.STRING, required=True)
-@click.option("--team-id", type=click.STRING, required=True)
-def search_experiments(view, jwt_token, team_id):
+def search_experiments(view, jwt_auth_token):
     """
     Search for experiments in the configured tracking server.
     """
@@ -72,7 +71,7 @@ def search_experiments(view, jwt_token, team_id):
             if is_uri(exp.artifact_location)
             else os.path.abspath(exp.artifact_location),
         ]
-        for exp in experiments if exp.team_id and exp.team_id in get_authorised_teams(jwt_token)
+        for exp in experiments if exp.team_id and exp.team_id in get_authorised_teams(jwt_auth_token)
     ]
     click.echo(_create_table(sorted(table), headers=["Experiment Id", "Name", "Artifact Location"]))
 
