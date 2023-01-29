@@ -456,7 +456,7 @@ class MlflowClient:
             Lifecycle_stage: active
         """
         experiment = self._tracking_client.get_experiment_by_name(name)
-        if experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
+        if not experiment or experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
             raise MlflowException(
                 "Could not find experiment with name %s" % name, RESOURCE_DOES_NOT_EXIST
             )
