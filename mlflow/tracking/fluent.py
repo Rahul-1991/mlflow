@@ -1055,6 +1055,7 @@ def search_experiments(
     max_results: Optional[int] = None,
     filter_string: Optional[str] = None,
     order_by: Optional[List[str]] = None,
+    token_file_path: Optional[str] = None
 ) -> List[Experiment]:
     """
     Search for experiments that match the specified search query.
@@ -1101,6 +1102,8 @@ def search_experiments(
             - ``name``: Experiment name
             - ``creation_time``: Experiment creation time
             - ``last_update_time``: Experiment last update time
+
+    :param token_file_path: file path at which the jwt token can be fetched from.
 
     :return: A list of :py:class:`Experiment <mlflow.entities.Experiment>` objects.
 
@@ -1152,7 +1155,7 @@ def search_experiments(
     """
 
     def pagination_wrapper_func(number_to_get, next_page_token):
-        return MlflowClient().search_experiments(
+        return MlflowClient(token_file_path=token_file_path).search_experiments(
             view_type=view_type,
             max_results=number_to_get,
             filter_string=filter_string,

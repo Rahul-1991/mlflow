@@ -3,9 +3,11 @@ import click
 import mlflow
 from mlflow.data import is_uri
 from mlflow.entities import ViewType
+from mlflow.exceptions import MlflowException
 from mlflow.tracking import _get_store, fluent
 from mlflow.utils.string_utils import _create_table
 from mlflow.utils.auth_utils import get_authorised_teams
+from mlflow.protos.databricks_pb2 import INVALID_PARAMETER_VALUE
 
 
 EXPERIMENT_ID = click.option("--experiment-id", "-x", type=click.STRING, required=True)
@@ -32,7 +34,8 @@ def commands():
     "If no location is provided, the tracking server will pick a default.",
 )
 @click.option("--team-id", type=click.STRING, required=True)
-def create(experiment_name, artifact_location, team_id):
+@click.option("--token-file-path", type=click.STRING, required=True)
+def create(experiment_name, artifact_location, team_id, token_file_path):
     """
     Create an experiment.
 
@@ -44,6 +47,8 @@ def create(experiment_name, artifact_location, team_id):
     as subfolders.
     """
     store = _get_store()
+    if team_id not in get_authorised_teams(token_file_path):
+        raise MlflowException('Team {} not authorised to perform create operation'.format(team_id), INVALID_PARAMETER_VALUE)
     exp_id = store.create_experiment(experiment_name, artifact_location, team_id=team_id)
     click.echo("Created experiment '%s' with id %s" % (experiment_name, exp_id))
 
@@ -56,13 +61,13 @@ def create(experiment_name, artifact_location, team_id):
     help="Select view type for experiments. Valid view types are "
     "'active_only' (default), 'deleted_only', and 'all'.",
 )
-@click.option("--jwt-auth-token", type=click.STRING, required=True)
-def search_experiments(view, jwt_auth_token):
+@click.option("--token-file-path", type=click.STRING, required=True)
+def search_experiments(view, token_file_path):
     """
     Search for experiments in the configured tracking server.
     """
     view_type = ViewType.from_string(view) if view else ViewType.ACTIVE_ONLY
-    experiments = mlflow.search_experiments(view_type=view_type)
+    experiments = mlflow.search_experiments(view_type=view_type, token_file_path=token_file_path)
     table = [
         [
             exp.experiment_id,
@@ -71,7 +76,7 @@ def search_experiments(view, jwt_auth_token):
             if is_uri(exp.artifact_location)
             else os.path.abspath(exp.artifact_location),
         ]
-        for exp in experiments if exp.team_id and exp.team_id in get_authorised_teams(jwt_auth_token)
+        for exp in experiments if exp.team_id and exp.team_id in get_authorised_teams(token_file_path)
     ]
     click.echo(_create_table(sorted(table), headers=["Experiment Id", "Name", "Artifact Location"]))
 

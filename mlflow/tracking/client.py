@@ -34,6 +34,7 @@ from mlflow.utils.logging_utils import eprint
 from mlflow.utils.uri import is_databricks_uri
 from mlflow.utils.validation import _validate_model_version_or_stage_exists
 from mlflow.utils.auth_utils import get_authorised_teams
+from mlflow.protos.databricks_pb2 import INVALID_PARAMETER_VALUE
 
 if TYPE_CHECKING:
     import matplotlib  # pylint: disable=unused-import
@@ -52,7 +53,7 @@ class MlflowClient:
     can keep the implementation of the tracking and registry clients independent from each other.
     """
 
-    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None, jwt_auth_token: Optional[str] = None):
+    def __init__(self, tracking_uri: Optional[str] = None, registry_uri: Optional[str] = None, token_file_path: Optional[str] = None):
         """
         :param tracking_uri: Address of local or remote tracking server. If not provided, defaults
                              to the service set by ``mlflow.tracking.set_tracking_uri``. See
@@ -65,7 +66,7 @@ class MlflowClient:
         final_tracking_uri = utils._resolve_tracking_uri(tracking_uri)
         self._registry_uri = registry_utils._resolve_registry_uri(registry_uri, tracking_uri)
         self._tracking_client = TrackingServiceClient(final_tracking_uri)
-        self._jwt_auth_token = jwt_auth_token
+        self._token_file_path = token_file_path
         # `MlflowClient` also references a `ModelRegistryClient` instance that is provided by the
         # `MlflowClient._get_registry_client()` method. This `ModelRegistryClient` is not explicitly
         # defined as an instance variable in the `MlflowClient` constructor; an instance variable
@@ -385,7 +386,7 @@ class MlflowClient:
             filter_string=filter_string,
             order_by=order_by,
             page_token=page_token,
-        ) if experiment.team_id and experiment.team_id in get_authorised_teams(self._jwt_auth_token)], page_token)
+        ) if experiment.team_id and experiment.team_id in get_authorised_teams(self._token_file_path)], page_token)
 
     def get_experiment(self, experiment_id: str) -> Experiment:
         """
@@ -418,7 +419,7 @@ class MlflowClient:
             Lifecycle_stage: active
         """
         experiment = self._tracking_client.get_experiment(experiment_id)
-        if experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
+        if experiment.team_id not in get_authorised_teams(self._token_file_path):
             raise MlflowException(
                 "Could not find experiment with ID %s" % experiment_id, RESOURCE_DOES_NOT_EXIST
             )
@@ -456,7 +457,7 @@ class MlflowClient:
             Lifecycle_stage: active
         """
         experiment = self._tracking_client.get_experiment_by_name(name)
-        if not experiment or experiment.team_id not in get_authorised_teams(self._jwt_auth_token):
+        if not experiment or experiment.team_id not in get_authorised_teams(self._token_file_path):
             raise MlflowException(
                 "Could not find experiment with name %s" % name, RESOURCE_DOES_NOT_EXIST
             )
@@ -512,6 +513,10 @@ class MlflowClient:
             Tags: {'version': 'v1', 'priority': 'P1', 'nlp.framework': 'Spark NLP'}
             Lifecycle_stage: active
         """
+        if team_id not in get_authorised_teams(self._token_file_path):
+            raise MlflowException(
+                'Team {} not authorised to perform create operation'.format(team_id), INVALID_PARAMETER_VALUE
+            )
         return self._tracking_client.create_experiment(name, artifact_location, tags, team_id)
 
     def delete_experiment(self, experiment_id: str) -> None:
