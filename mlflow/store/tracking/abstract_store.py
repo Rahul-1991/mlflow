@@ -335,3 +335,19 @@ class AbstractStore:
         :return: None.
         """
         pass
+
+    @abstractmethod
+    def get_jwt_auth_token(self, username: str, password: str, team_ids: list) -> str:
+        """
+        Generate a JWT token from username and password containing all the permissions of the user.
+        These permissions are used to check user access to perform an operation in mlflow.
+        :param username:
+        :param password:
+        :param team_ids:
+        :return: A JWT token representing the user details.
+        """
+        pass
+
+    @abstractmethod
+    def set_jwt_auth_token(self, auth_token):
+        pass

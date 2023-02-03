@@ -80,6 +80,10 @@ class SqlExperiment(Base):
     """
     Last Update time of experiment: `BigInteger`.
     """
+    team_id = Column(String(32), nullable=True)
+    """
+    Team to which the created experiment belongs
+    """
 
     __table_args__ = (
         CheckConstraint(
@@ -106,6 +110,7 @@ class SqlExperiment(Base):
             tags=[t.to_mlflow_entity() for t in self.tags],
             creation_time=self.creation_time,
             last_update_time=self.last_update_time,
+            team_id=self.team_id
         )
 
 

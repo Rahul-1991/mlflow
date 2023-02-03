@@ -9,6 +9,7 @@ from mlflow.exceptions import MlflowException
 from mlflow.protos.databricks_pb2 import INVALID_PARAMETER_VALUE
 from mlflow.store.db.db_types import DATABASE_ENGINES
 from mlflow.utils.string_utils import is_string_type
+from mlflow.utils.auth_utils import get_authorised_teams_from_token
 
 # Regex for valid param and metric names: may only contain slashes, alphanumerics,
 # underscores, periods, dashes, and spaces.
@@ -380,3 +381,12 @@ def _validate_model_version_or_stage_exists(version, stage):
 def _validate_tag_value(value):
     if value is None:
         raise MlflowException("Tag value cannot be None", INVALID_PARAMETER_VALUE)
+
+
+def _validate_creation_team(team_id, jwt_auth_token):
+    if not team_id:
+        raise MlflowException("Parameter team_id is missing", INVALID_PARAMETER_VALUE)
+    if not jwt_auth_token:
+        raise MlflowException("jwt_auth_token must be passed in header", INVALID_PARAMETER_VALUE)
+    if team_id not in get_authorised_teams_from_token(jwt_auth_token):
+        raise MlflowException('Team {} does not access to create experiment'.format(team_id), INVALID_PARAMETER_VALUE)

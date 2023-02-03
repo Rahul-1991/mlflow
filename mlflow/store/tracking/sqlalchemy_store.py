@@ -55,9 +55,11 @@ from mlflow.utils.validation import (
     _validate_param_keys_unique,
     _validate_param,
     _validate_experiment_name,
+    _validate_creation_team
 )
 from mlflow.utils.mlflow_tags import MLFLOW_LOGGED_MODELS, MLFLOW_RUN_NAME, _get_run_name_from_tags
 from mlflow.utils.time_utils import get_current_time_millis
+from mlflow.utils.auth_utils import get_authorised_teams
 
 _logger = logging.getLogger(__name__)
 
@@ -152,9 +154,9 @@ class SqlAlchemyStore(AbstractStore):
         if is_local_uri(default_artifact_root):
             mkdir(local_file_uri_to_path(default_artifact_root))
 
-        if len(self.search_experiments(view_type=ViewType.ALL)) == 0:
-            with self.ManagedSessionMaker() as session:
-                self._create_default_experiment(session)
+        # if len(self.search_experiments(view_type=ViewType.ALL)) == 0:
+        #     with self.ManagedSessionMaker() as session:
+        #         self._create_default_experiment(session)
 
     def _get_dialect(self):
         return self.engine.dialect.name
@@ -242,9 +244,8 @@ class SqlAlchemyStore(AbstractStore):
     def _get_artifact_location(self, experiment_id):
         return append_to_uri_path(self.artifact_root_uri, str(experiment_id))
 
-    def create_experiment(self, name, artifact_location=None, tags=None):
+    def create_experiment(self, name, artifact_location=None, tags=None, team_id=None):
         _validate_experiment_name(name)
-
         with self.ManagedSessionMaker() as session:
             try:
                 creation_time = get_current_time_millis()
@@ -254,6 +255,7 @@ class SqlAlchemyStore(AbstractStore):
                     artifact_location=artifact_location,
                     creation_time=creation_time,
                     last_update_time=creation_time,
+                    team_id=team_id
                 )
                 experiment.tags = (
                     [SqlExperimentTag(key=tag.key, value=tag.value) for tag in tags] if tags else []

@@ -594,12 +594,13 @@ def _create_experiment():
             "name": [_assert_required, _assert_string],
             "artifact_location": [_assert_string],
             "tags": [_assert_array],
+            "team_id": [_assert_string]
         },
     )
 
     tags = [ExperimentTag(tag.key, tag.value) for tag in request_message.tags]
     experiment_id = _get_tracking_store().create_experiment(
-        request_message.name, request_message.artifact_location, tags
+        request_message.name, request_message.artifact_location, tags, request_message.team_id
     )
     response_message = CreateExperiment.Response()
     response_message.experiment_id = experiment_id

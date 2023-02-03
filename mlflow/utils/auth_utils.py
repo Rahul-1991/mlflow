@@ -14,6 +14,14 @@ def get_decrypted_jwt_data(token):
         raise MlflowException('Invalid jwt token', error_code=PERMISSION_DENIED)
 
 
+def get_authorised_teams_from_token(token):
+    try:
+        decoded_token_data = get_decrypted_jwt_data(token)
+        return [team.get('team_id') for team in decoded_token_data.get('teams', list())]
+    except Exception as e:
+        raise MlflowException('Invalid jwt token', error_code=PERMISSION_DENIED)
+
+
 def get_authorised_teams(token_file):
     """
     :param token_file:  String - file containing access token with information about the user
@@ -22,7 +30,6 @@ def get_authorised_teams(token_file):
     try:
         with open(token_file, 'r') as file_handle:
             token = file_handle.read()
-        decoded_token_data = get_decrypted_jwt_data(token)
-        return [team.get('team_id') for team in decoded_token_data.get('teams', list())]
+        return get_authorised_teams_from_token(token)
     except Exception as e:
         raise MlflowException('Invalid token path', error_code=PERMISSION_DENIED)
